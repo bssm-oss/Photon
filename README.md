@@ -4,7 +4,6 @@
 
 **I**ntegrated **O**bject **N**etwork
 
-[![npm](https://img.shields.io/badge/npm-ion--engine-blue)](https://www.npmjs.com/package/ion-engine)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 [English](#english) · [한국어](#한국어)
