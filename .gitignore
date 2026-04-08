@@ -1,0 +1,38 @@
+# ── Dependencies ──
+node_modules/
+
+# ── Build output ──
+dist/
+dist-renderer/
+*.js.map
+*.d.ts.map
+
+# ── OS junk ──
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Env / Secrets ──
+.env
+.env.*
+!.env.example
+
+# ── IDE ──
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ── Claude / AI tools ──
+.claude/
+.cursor/
+.aider*
+
+# ── Temp / Logs ──
+*.tmp
+*.log
+npm-debug.log*
+
+# ── Lock files (templates only) ──
+packages/create-ion/templates/**/package-lock.json
+packages/create-ion/templates/**/node_modules/

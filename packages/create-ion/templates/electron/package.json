@@ -1,0 +1,22 @@
+{
+  "name": "ion-template-electron",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "electron:dev": "electron .",
+    "electron:build": "vite build && electron-builder"
+  },
+  "main": "electron/main.js",
+  "dependencies": {
+    "ion-engine": "^0.1.0",
+    "@ion-engine/electron": "^0.1.0"
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "vite": "^6.0.0",
+    "typescript": "^5.6.0"
+  }
+}

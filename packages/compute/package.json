@@ -1,0 +1,30 @@
+{
+  "name": "@ion-engine/compute",
+  "version": "0.1.0",
+  "description": "High-performance compute backend for Ion Engine",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "echo 'compute tests run via core package'",
+    "prepublishOnly": "npm run build"
+  },
+  "peerDependencies": {
+    "ion-engine": "^0.1.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "ion-engine": "^0.1.0"
+  },
+  "license": "MIT"
+}
