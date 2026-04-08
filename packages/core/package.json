@@ -1,5 +1,5 @@
 {
-  "name": "ion-engine",
+  "name": "photon-engine",
   "version": "0.1.0",
   "description": "Lightweight 2D game engine with ECS architecture",
   "type": "module",
@@ -11,7 +11,7 @@
       "types": "./dist/index.d.ts"
     }
   },
-  "files": ["dist"],
+  "files": ["dist", "README.md"],
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
@@ -20,11 +20,17 @@
     "test:watch": "vitest",
     "prepublishOnly": "npm run build"
   },
-  "keywords": ["game-engine", "2d", "ecs", "webgl", "typescript", "electron"],
+  "keywords": ["game-engine", "2d", "ecs", "webgl", "typescript", "electron", "photon"],
+  "author": "bssm-oss",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-org/ion-engine"
+    "url": "https://github.com/bssm-oss/Ion.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/bssm-oss/Ion#readme",
+  "bugs": {
+    "url": "https://github.com/bssm-oss/Ion/issues"
   },
   "devDependencies": {
     "typescript": "^5.6.0",

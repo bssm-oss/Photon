@@ -1,12 +1,13 @@
 <div align="center">
 
-# ⚡ Ion Engine
+# ⚡ Photon Engine
 
-**I**ntegrated **O**bject **N**etwork
+**P**erformant, **H**ardware-accelerated, **O**bject, **T**ransform, **O**rientation, **N**etwork
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 [English](#english) · [한국어](#한국어)
+
 
 </div>
 
@@ -37,13 +38,13 @@
 ## Quick Start
 
 ```bash
-npm create ion my-game
+npm create photon my-game
 # or
-npm install ion-engine
+npm install photon-engine
 ```
 
 ```ts
-import { Engine, Scene, Transform2D, Camera2D, Sprite } from "ion-engine";
+import { Engine, Scene, Transform2D, Camera2D, Sprite } from "photon-engine";
 
 class MyScene extends Scene {
   readonly name = "my-scene";
@@ -65,7 +66,7 @@ class MyScene extends Scene {
   onExit() { this.world.clear(); }
 }
 
-const engine = new Engine({ canvasId: "ion-canvas" });
+const engine = new Engine({ canvasId: "photon-canvas" });
 engine.sceneManager.register(new MyScene());
 engine.sceneManager.switchTo("my-scene");
 engine.start();
@@ -75,19 +76,19 @@ engine.start();
 
 ```
 packages/
-├── core/            Main engine (ion-engine)
-├── electron/        Electron adapter (@ion-engine/electron)
+├── core/            Main engine (photon-engine)
+├── electron/        Electron adapter (photon-engine-electron)
 ├── browser/         Browser utilities
-├── compute/         JS compute backend (@ion-engine/compute)
-└── create-ion/      Project scaffolding CLI (create-ion)
+├── compute/         JS compute backend (@photon-engine/compute)
+└── create-photon/   Project scaffolding CLI (create-photon)
 ```
 
 ## Platform Support
 
 | Platform | Package | Status |
 |----------|---------|--------|
-| Browser | `ion-engine` (core) | ✅ Supported |
-| Electron | `@ion-engine/electron` | ✅ Supported |
+| Browser | `photon-engine` (core) | ✅ Supported |
+| Electron | `photon-engine-electron` | ✅ Supported |
 
 ## Platform Adapters
 
@@ -95,12 +96,12 @@ The engine core is **completely platform-independent**. Inject adapters at const
 
 ```ts
 // Browser only
-import { Engine } from "ion-engine";
+import { Engine } from "photon-engine";
 const engine = new Engine({ canvasId: "game-canvas" });
 
 // Electron desktop
-import { Engine } from "ion-engine";
-import { ElectronNativeBridge } from "@ion-engine/electron";
+import { Engine } from "photon-engine";
+import { ElectronNativeBridge } from "photon-engine-electron";
 const engine = new Engine({ nativeBridge: new ElectronNativeBridge() });
 ```
 
@@ -145,13 +146,13 @@ MIT
 ## 빠른 시작
 
 ```bash
-npm create ion my-game
+npm create photon my-game
 # 또는
-npm install ion-engine
+npm install photon-engine
 ```
 
 ```ts
-import { Engine, Scene, Transform2D, Camera2D, Sprite } from "ion-engine";
+import { Engine, Scene, Transform2D, Camera2D, Sprite } from "photon-engine";
 
 class MyScene extends Scene {
   readonly name = "my-scene";
@@ -173,7 +174,7 @@ class MyScene extends Scene {
   onExit() { this.world.clear(); }
 }
 
-const engine = new Engine({ canvasId: "ion-canvas" });
+const engine = new Engine({ canvasId: "photon-canvas" });
 engine.sceneManager.register(new MyScene());
 engine.sceneManager.switchTo("my-scene");
 engine.start();
@@ -183,19 +184,19 @@ engine.start();
 
 ```
 packages/
-├── core/            메인 엔진 (ion-engine)
-├── electron/        Electron 어댑터 (@ion-engine/electron)
+├── core/            메인 엔진 (photon-engine)
+├── electron/        Electron 어댑터 (photon-engine-electron)
 ├── browser/         브라우저 유틸리티
-├── compute/         JS 연산 백엔드 (@ion-engine/compute)
-└── create-ion/      프로젝트 스캐폴딩 CLI (create-ion)
+├── compute/         JS 연산 백엔드 (@photon-engine/compute)
+└── create-photon/   프로젝트 스캐폴딩 CLI (create-photon)
 ```
 
 ## 플랫폼 지원
 
 | 플랫폼 | 패키지 | 상태 |
 |--------|--------|------|
-| Browser | `ion-engine` (코어) | ✅ 지원 |
-| Electron | `@ion-engine/electron` | ✅ 지원 |
+| Browser | `photon-engine` (코어) | ✅ 지원 |
+| Electron | `photon-engine-electron` | ✅ 지원 |
 
 ## 플랫폼 어댑터
 
@@ -203,12 +204,12 @@ packages/
 
 ```ts
 // 브라우저
-import { Engine } from "ion-engine";
+import { Engine } from "photon-engine";
 const engine = new Engine({ canvasId: "game-canvas" });
 
 // Electron 데스크탑
-import { Engine } from "ion-engine";
-import { ElectronNativeBridge } from "@ion-engine/electron";
+import { Engine } from "photon-engine";
+import { ElectronNativeBridge } from "photon-engine-electron";
 const engine = new Engine({ nativeBridge: new ElectronNativeBridge() });
 ```
 

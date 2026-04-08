@@ -36,7 +36,7 @@ export class Engine {
   readonly canvas: HTMLCanvasElement;
 
   constructor(config: EngineConfig = {}) {
-    const canvasId = config.canvasId ?? "ion-canvas";
+    const canvasId = config.canvasId ?? "photon-canvas";
     const canvas = document.getElementById(canvasId) as HTMLCanvasElement;
     if (!canvas) throw new Error(`Canvas "#${canvasId}" not found`);
 

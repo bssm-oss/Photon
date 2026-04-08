@@ -44,7 +44,7 @@ export class NoopCompute implements IComputeBackend {
   }
 
   async pathfind(): Promise<Vec2[] | null> {
-    console.warn("[Ion] pathfind: no compute backend, returning null");
+    console.warn("[Photon] pathfind: no compute backend, returning null");
     return null;
   }
 }
@@ -57,6 +57,6 @@ export class NullNativeBridge implements INativeBridge {
   }
 
   async invoke(command: string, _args?: Record<string, unknown>): Promise<unknown> {
-    throw new Error(`[Ion] Native invoke "${command}" not available in browser mode`);
+    throw new Error(`[Photon] Native invoke "${command}" not available in browser mode`);
   }
 }

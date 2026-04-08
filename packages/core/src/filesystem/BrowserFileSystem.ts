@@ -67,13 +67,13 @@ export class BrowserFileSystem implements IFileSystem {
       for (const [k, v] of this.storage) {
         obj[k] = [...v];
       }
-      localStorage.setItem("ion:fs", JSON.stringify(obj));
+      localStorage.setItem("photon:fs", JSON.stringify(obj));
     } catch { /* quota exceeded, ignore */ }
   }
 
   loadFromLocalStorage(): void {
     try {
-      const raw = localStorage.getItem("ion:fs");
+      const raw = localStorage.getItem("photon:fs");
       if (!raw) return;
       const obj = JSON.parse(raw) as Record<string, number[]>;
       for (const [k, v] of Object.entries(obj)) {
