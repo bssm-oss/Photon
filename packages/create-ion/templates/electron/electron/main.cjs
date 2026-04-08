@@ -1,17 +1,21 @@
 const { app, BrowserWindow } = require("electron");
 const path = require("path");
 
+let win;
+
 app.whenReady().then(() => {
-  const win = new BrowserWindow({
+  win = new BrowserWindow({
     width: 1280,
     height: 720,
+    title: "Ion",
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
+      nodeIntegration: false,
+      contextIsolation: true,
     },
   });
 
   win.loadFile(path.join(__dirname, "..", "dist-renderer", "index.html"));
+  win.webContents.openDevTools();
 });
 
 app.on("window-all-closed", () => app.quit());

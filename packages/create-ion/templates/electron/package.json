@@ -9,7 +9,7 @@
     "electron:dev": "electron .",
     "electron:build": "vite build && electron-builder"
   },
-  "main": "electron/main.js",
+  "main": "electron/main.cjs",
   "dependencies": {
     "ion-engine": "^0.1.0",
     "@ion-engine/electron": "^0.1.0"

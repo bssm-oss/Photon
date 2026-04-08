@@ -1,7 +1,8 @@
 import { defineConfig } from "vite";
+import { resolve } from "path";
 
 export default defineConfig({
-  clearScreen: false,
-  server: { port: 3000 },
   build: { outDir: "dist-renderer" },
+  base: "./",
+  server: { port: 3001 },
 });
