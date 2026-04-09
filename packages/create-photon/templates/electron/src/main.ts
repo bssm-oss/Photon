@@ -19,9 +19,15 @@ class DemoScene extends Scene {
   readonly name = "demo";
   private uiSystem = new UIRenderSystem();
   private clickCount = 0;
-  private scoreTextEntityId = 0;
-  private nameTextEntityId = 0;
-  private btnEntityId = 0;
+
+  private panelId = 0;
+  private titleId = 0;
+  private scoreId = 0;
+  private scoreTextId = 0;
+  private btnId = 0;
+  private labelId = 0;
+  private inputId = 0;
+  private inputTextId = 0;
 
   onEnter(): void {
     this.world.registerSystem(this.uiSystem);
@@ -77,11 +83,12 @@ class DemoScene extends Scene {
     }
 
     this.createUI();
+    this.layoutUI();
 
     this.world.eventBus.on<number>("ui:click", (entityId) => {
-      if (entityId === this.btnEntityId) {
+      if (entityId === this.btnId) {
         this.clickCount++;
-        const arch = this.world.getArchetype(this.scoreTextEntityId);
+        const arch = this.world.getArchetype(this.scoreTextId);
         if (arch) {
           const t = arch.get<UIText>("uiText")!;
           t.text = `Clicks: ${this.clickCount}`;
@@ -89,39 +96,27 @@ class DemoScene extends Scene {
       }
     });
 
-    this.world.eventBus.on<{ entityId: number; value: string }>("ui:change", (data) => {
-      if (data.entityId === this.nameTextEntityId) {
-        const arch = this.world.getArchetype(this.nameTextEntityId);
-        if (arch) {
-          const t = arch.get<UIText>("uiText")!;
-        }
-      }
-    });
+    this.engine.eventBus.on("engine:resize", () => this.layoutUI());
   }
 
   private createUI(): void {
-    const sw = this.engine.cssWidth;
-    const sh = this.engine.cssHeight;
+    this.panelId = this.world.createEntity().id;
+    this.world.addComponent(this.panelId, new UITransform(0, 0));
+    this.world.addComponent(this.panelId, new UIPanel(340, 180, 0.08, 0.08, 0.1, 0.85, 8));
 
-    const panel = this.world.createEntity();
-    this.world.addComponent(panel.id, new UITransform(sw / 2 - 170, 20));
-    this.world.addComponent(panel.id, new UIPanel(340, 200, 0.08, 0.08, 0.1, 0.85, 8));
-
-    const title = this.world.createEntity();
-    this.world.addComponent(title.id, new UITransform(sw / 2, 40));
-    this.world.addComponent(title.id, new UIText(
+    this.titleId = this.world.createEntity().id;
+    this.world.addComponent(this.titleId, new UITransform(0, 0));
+    this.world.addComponent(this.titleId, new UIText(
       "Photon Engine — Electron", "sans-serif", 20, 0.5, 0.7, 1, 1, Align.Center, true,
     ));
 
-    const score = this.world.createEntity();
-    this.world.addComponent(score.id, new UITransform(sw / 2 - 150, 75));
-    this.scoreTextEntityId = score.id;
-    this.world.addComponent(score.id, new UIText("Clicks: 0", "monospace", 16, 1, 1, 1, 1));
+    this.scoreId = this.world.createEntity().id;
+    this.world.addComponent(this.scoreId, new UITransform(0, 0));
+    this.world.addComponent(this.scoreId, new UIText("Clicks: 0", "monospace", 16, 1, 1, 1, 1));
 
-    const btn = this.world.createEntity();
-    this.btnEntityId = btn.id;
-    this.world.addComponent(btn.id, new UITransform(sw / 2 - 80, 105));
-    this.world.addComponent(btn.id, new UIButton(
+    this.btnId = this.world.createEntity().id;
+    this.world.addComponent(this.btnId, new UITransform(0, 0));
+    this.world.addComponent(this.btnId, new UIButton(
       160, 40, "Click Me!",
       0.16, 0.5, 1, 1,
       0.29, 0.62, 1, 1,
@@ -129,23 +124,45 @@ class DemoScene extends Scene {
       8, 16, true,
     ));
 
-    const nameLabel = this.world.createEntity();
-    this.world.addComponent(nameLabel.id, new UITransform(sw / 2 - 150, 158));
-    this.world.addComponent(nameLabel.id, new UIText("Name:", "sans-serif", 14, 0.7, 0.7, 0.7, 1));
+    this.labelId = this.world.createEntity().id;
+    this.world.addComponent(this.labelId, new UITransform(0, 0));
+    this.world.addComponent(this.labelId, new UIText("Name:", "sans-serif", 14, 0.7, 0.7, 0.7, 1));
 
-    const nameInput = this.world.createEntity();
-    this.nameTextEntityId = nameInput.id;
-    this.world.addComponent(nameInput.id, new UITransform(sw / 2 - 100, 155));
-    this.world.addComponent(nameInput.id, new UITextInput(
+    this.inputId = this.world.createEntity().id;
+    this.world.addComponent(this.inputId, new UITransform(0, 0));
+    this.world.addComponent(this.inputId, new UITextInput(
       200, 28, "Type here...", 64,
       0.12, 0.12, 0.14, 1,
       0.3, 0.3, 0.3, 1,
       0.3, 0.6, 1, 1,
       14,
     ));
-    this.world.addComponent(nameInput.id, new UIText(
+    this.world.addComponent(this.inputId, new UIText(
       "", "sans-serif", 14, 1, 1, 1, 1,
     ));
+  }
+
+  private layoutUI(): void {
+    const sw = this.engine.cssWidth;
+    const sh = this.engine.cssHeight;
+
+    const archPanel = this.world.getArchetype(this.panelId);
+    if (archPanel) archPanel.get<UITransform>("uiTransform")!.x = sw / 2 - 170;
+
+    const archTitle = this.world.getArchetype(this.titleId);
+    if (archTitle) archTitle.get<UITransform>("uiTransform")!.x = sw / 2;
+
+    const archScore = this.world.getArchetype(this.scoreId);
+    if (archScore) archScore.get<UITransform>("uiTransform")!.x = sw / 2 - 150;
+
+    const archBtn = this.world.getArchetype(this.btnId);
+    if (archBtn) archBtn.get<UITransform>("uiTransform")!.x = sw / 2 - 80;
+
+    const archLabel = this.world.getArchetype(this.labelId);
+    if (archLabel) archLabel.get<UITransform>("uiTransform")!.x = sw / 2 - 150;
+
+    const archInput = this.world.getArchetype(this.inputId);
+    if (archInput) archInput.get<UITransform>("uiTransform")!.x = sw / 2 - 100;
   }
 
   onUpdate(): void {

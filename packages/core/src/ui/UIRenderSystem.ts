@@ -35,6 +35,9 @@ export class UIRenderSystem extends System {
   private _onInput!: () => void;
   private _onBlur!: () => void;
 
+  private _onCompositionStart!: () => void;
+  private _onCompositionEnd!: (e: CompositionEvent) => void;
+
   onInit(world: World): void {
     if (!world.scene?.engine) {
       throw new Error("UIRenderSystem requires scene registered via engine.sceneManager.register()");
@@ -96,25 +99,33 @@ export class UIRenderSystem extends System {
   private setupHiddenTextarea(): void {
     this.hiddenTextarea = document.createElement("textarea");
     this.hiddenTextarea.style.cssText =
-      "position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0;pointer-events:none;";
+      "position:fixed;left:0;top:0;width:1px;height:1px;opacity:0.01;border:none;outline:none;padding:0;margin:0;";
     this.hiddenTextarea.setAttribute("autocomplete", "off");
     this.hiddenTextarea.setAttribute("autocorrect", "off");
     this.hiddenTextarea.setAttribute("autocapitalize", "off");
     this.hiddenTextarea.setAttribute("spellcheck", "false");
+    this.hiddenTextarea.setAttribute("tabindex", "-1");
     document.body.appendChild(this.hiddenTextarea);
 
     this._onInput = () => this.handleTextareaInput();
     this._onBlur = () => this.blurFocusedInput();
+    this._onCompositionStart = () => { this.isComposing = true; };
+    this._onCompositionEnd = (e: CompositionEvent) => this.handleCompositionEnd(e);
 
     this.hiddenTextarea.addEventListener("input", this._onInput);
     this.hiddenTextarea.addEventListener("blur", this._onBlur);
+    this.hiddenTextarea.addEventListener("compositionstart", this._onCompositionStart);
+    this.hiddenTextarea.addEventListener("compositionend", this._onCompositionEnd);
   }
+
+  private isComposing = false;
 
   private focusInput(entityId: number): void {
     this.focusedId = entityId;
     this.textareaEntityId = entityId;
-    this.hiddenTextarea.focus();
     this.hiddenTextarea.value = "";
+    this.hiddenTextarea.focus();
+    this.isComposing = false;
     this.bus.emit("ui:focus", entityId);
   }
 
@@ -124,11 +135,12 @@ export class UIRenderSystem extends System {
     }
     this.textareaEntityId = null;
     this.focusedId = null;
+    this.isComposing = false;
     this.hiddenTextarea.blur();
   }
 
   private handleTextareaInput(): void {
-    if (this.textareaEntityId === null) return;
+    if (this.textareaEntityId === null || this.isComposing) return;
     const scene = this.engine.sceneManager.currentScene;
     if (!scene) return;
 
@@ -139,15 +151,17 @@ export class UIRenderSystem extends System {
     const txt = arch.get<UIText>("uiText");
     if (!input || !txt) return;
 
-    const newValue = this.hiddenTextarea.value;
-    if (newValue.length > 0) {
-      const lastChar = newValue[newValue.length - 1];
-      if (txt.text.length < input.maxLength) {
-        txt.text += lastChar;
-        this.bus.emit("ui:change", { entityId: this.textareaEntityId, value: txt.text });
-      }
+    const prev = txt.text;
+    txt.text = this.hiddenTextarea.value.slice(0, input.maxLength);
+    this.hiddenTextarea.value = txt.text;
+    if (txt.text !== prev) {
+      this.bus.emit("ui:change", { entityId: this.textareaEntityId, value: txt.text });
     }
-    this.hiddenTextarea.value = "";
+  }
+
+  private handleCompositionEnd(e: CompositionEvent): void {
+    this.isComposing = false;
+    this.handleTextareaInput();
   }
 
   private handleMouseMove(mx: number, my: number): void {
@@ -248,23 +262,9 @@ export class UIRenderSystem extends System {
 
   private handleKeyDown(e: KeyboardEvent): void {
     if (this.textareaEntityId === null) return;
-    const scene = this.engine.sceneManager.currentScene;
-    if (!scene) return;
-
-    const arch = scene.world.getArchetype(this.textareaEntityId);
-    if (!arch) return;
-
-    const txt = arch.get<UIText>("uiText");
-    if (!txt) return;
-
-    if (e.code === "Backspace") {
-      if (txt.text.length > 0) {
-        txt.text = txt.text.slice(0, -1);
-        this.bus.emit("ui:change", { entityId: this.textareaEntityId, value: txt.text });
-      }
-      e.preventDefault();
-    } else if (e.code === "Escape") {
+    if (e.code === "Escape") {
       this.blurFocusedInput();
+      e.preventDefault();
     }
   }
 
@@ -455,6 +455,8 @@ export class UIRenderSystem extends System {
     window.removeEventListener("resize", this._onResize);
     this.hiddenTextarea.removeEventListener("input", this._onInput);
     this.hiddenTextarea.removeEventListener("blur", this._onBlur);
+    this.hiddenTextarea.removeEventListener("compositionstart", this._onCompositionStart);
+    this.hiddenTextarea.removeEventListener("compositionend", this._onCompositionEnd);
     this.hiddenTextarea.remove();
     this.overlay.remove();
   }
