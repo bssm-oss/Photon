@@ -1,1 +1,1 @@
-export { PhotonCompute } from "./IonCompute";
+export { PhotonCompute } from "./PhotonCompute";
