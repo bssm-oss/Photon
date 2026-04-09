@@ -30,6 +30,10 @@ pkgJson.name = projectName;
 delete pkgJson.private;
 writeFileSync(join(cwd, "package.json"), JSON.stringify(pkgJson, null, 2));
 
+const htmlPath = join(cwd, "index.html");
+const html = readFileSync(htmlPath, "utf-8");
+writeFileSync(htmlPath, html.replace(/<title>.*?<\/title>/, `<title>${projectName}</title>`));
+
 console.log("  Installing dependencies...\n");
 execSync(`npm install`, { cwd, stdio: "inherit" });
 
