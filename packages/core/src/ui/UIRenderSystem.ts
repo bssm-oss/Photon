@@ -82,8 +82,15 @@ export class UIRenderSystem extends System {
   }
 
   private syncSize(): void {
-    this.overlay.width = this.engine.canvas.width;
-    this.overlay.height = this.engine.canvas.height;
+    const dpr = this.engine.pixelRatio;
+    const rect = this.engine.canvas.getBoundingClientRect();
+    const w = rect.width;
+    const h = rect.height;
+    this.overlay.width = Math.round(w * dpr);
+    this.overlay.height = Math.round(h * dpr);
+    this.overlay.style.width = w + "px";
+    this.overlay.style.height = h + "px";
+    this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
 
   private setupHiddenTextarea(): void {
@@ -264,7 +271,8 @@ export class UIRenderSystem extends System {
   onUpdate(_world: World, archetypes: Archetype[], dt: number): void {
     this.syncSize();
     const ctx = this.ctx;
-    ctx.clearRect(0, 0, this.overlay.width, this.overlay.height);
+    const rect = this.engine.canvas.getBoundingClientRect();
+    ctx.clearRect(0, 0, rect.width, rect.height);
 
     for (const arch of archetypes) {
       const ui = arch.get<UITransform>("uiTransform");

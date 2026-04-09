@@ -35,13 +35,21 @@ export class Engine {
 
   readonly canvas: HTMLCanvasElement;
 
+  private dpr = 1;
+
   constructor(config: EngineConfig = {}) {
     const canvasId = config.canvasId ?? "photon-canvas";
     const canvas = document.getElementById(canvasId) as HTMLCanvasElement;
     if (!canvas) throw new Error(`Canvas "#${canvasId}" not found`);
 
-    canvas.width = config.width ?? window.innerWidth;
-    canvas.height = config.height ?? window.innerHeight;
+    this.dpr = window.devicePixelRatio || 1;
+
+    const cssW = config.width ?? window.innerWidth;
+    const cssH = config.height ?? window.innerHeight;
+    canvas.style.width = cssW + "px";
+    canvas.style.height = cssH + "px";
+    canvas.width = Math.round(cssW * this.dpr);
+    canvas.height = Math.round(cssH * this.dpr);
     this.canvas = canvas;
 
     this.eventBus = new EventBus();
@@ -64,13 +72,22 @@ export class Engine {
   }
 
   private handleResize(): void {
-    this.canvas.width = window.innerWidth;
-    this.canvas.height = window.innerHeight;
+    this.dpr = window.devicePixelRatio || 1;
+    const cssW = window.innerWidth;
+    const cssH = window.innerHeight;
+    this.canvas.style.width = cssW + "px";
+    this.canvas.style.height = cssH + "px";
+    this.canvas.width = Math.round(cssW * this.dpr);
+    this.canvas.height = Math.round(cssH * this.dpr);
     this.renderer.resize(this.canvas.width, this.canvas.height);
     this.eventBus.emit("engine:resize", {
       width: this.canvas.width,
       height: this.canvas.height,
     });
+  }
+
+  get pixelRatio(): number {
+    return this.dpr;
   }
 
   start(): void {
