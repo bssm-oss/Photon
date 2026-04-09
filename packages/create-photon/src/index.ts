@@ -6,7 +6,7 @@ import { execSync } from "child_process";
 
 const args = process.argv.slice(2);
 const projectName = args[0] || "my-photon-game";
-const template = args.includes("--electron") ? "electron" : "browser";
+const template = (args.includes("--electron") || args[1] === "electron") ? "electron" : "browser";
 
 const cwd = resolve(projectName);
 
