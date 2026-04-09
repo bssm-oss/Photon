@@ -7,7 +7,7 @@ app.whenReady().then(() => {
   win = new BrowserWindow({
     width: 1280,
     height: 720,
-    title: "Ion",
+    title: "Photon",
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,

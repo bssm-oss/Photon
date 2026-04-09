@@ -1,4 +1,4 @@
-import { IFileSystem } from "ion-engine";
+import { IFileSystem } from "photon-engine";
 
 export class ElectronFileSystem implements IFileSystem {
   private nodeFs: typeof import("fs") | null = null;

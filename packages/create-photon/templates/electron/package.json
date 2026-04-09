@@ -1,7 +1,7 @@
 {
-  "name": "ion-template-electron",
+  "name": "photon-template-electron",
   "private": true,
-  "version": "0.1.0",
+  "versphoton": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -11,8 +11,8 @@
   },
   "main": "electron/main.cjs",
   "dependencies": {
-    "ion-engine": "^0.1.0",
-    "@ion-engine/electron": "^0.1.0"
+    "photon-engine": "^0.1.0",
+    "@photon-engine/electron": "^0.1.0"
   },
   "devDependencies": {
     "electron": "^28.0.0",

@@ -1,6 +1,6 @@
 import {
   Engine, Scene, Transform2D, Camera2D, Sprite, Component,
-} from "ion-engine";
+} from "photon-engine";
 
 class OrbitalSpeed extends Component {
   readonly type = "orbitalSpeed";

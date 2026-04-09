@@ -1,4 +1,4 @@
-import { INativeBridge } from "ion-engine";
+import { INativeBridge } from "photon-engine";
 import { ElectronFileSystem } from "./ElectronFileSystem";
 
 export class ElectronNativeBridge implements INativeBridge {

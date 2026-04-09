@@ -5,7 +5,7 @@ import { resolve, join } from "path";
 import { execSync } from "child_process";
 
 const args = process.argv.slice(2);
-const projectName = args[0] || "my-ion-game";
+const projectName = args[0] || "my-photon-game";
 const template = args.includes("--tauri") ? "tauri"
   : args.includes("--electron") ? "electron"
   : "browser";
