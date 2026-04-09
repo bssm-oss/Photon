@@ -315,15 +315,24 @@ export class UIRenderSystem extends System {
     this.roundRect(ctx, x, y, btn.width, btn.height, btn.borderRadius);
     ctx.fill();
 
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(x, y, btn.width, btn.height);
+    ctx.clip();
+
     ctx.font = `${btn.fontSize}px sans-serif`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillStyle = rgba(1, 1, 1, 1);
     ctx.fillText(btn.label, x + btn.width / 2, y + btn.height / 2);
 
+    ctx.restore();
+
     if (btn.focused) {
       ctx.strokeStyle = rgba(1, 1, 1, 0.6);
       ctx.lineWidth = 2;
+      ctx.beginPath();
+      this.roundRect(ctx, x, y, btn.width, btn.height, btn.borderRadius);
       ctx.stroke();
     }
   }
@@ -397,6 +406,11 @@ export class UIRenderSystem extends System {
     w: number,
     h: number,
   ): void {
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(ui.drawX + ox, ui.drawY + oy, w, h);
+    ctx.clip();
+
     ctx.font = txt.fontString;
 
     let align: CanvasTextAlign = "left";
@@ -416,6 +430,8 @@ export class UIRenderSystem extends System {
 
     ctx.fillStyle = rgba(txt.colorR, txt.colorG, txt.colorB, txt.colorA);
     ctx.fillText(txt.text, textX, textY);
+
+    ctx.restore();
   }
 
   private roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number): void {

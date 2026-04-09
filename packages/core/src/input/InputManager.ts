@@ -21,6 +21,10 @@ export class InputManager {
 
   constructor(private canvas: HTMLCanvasElement) {
     this.keyDownHandler = (e) => {
+      if (document.activeElement instanceof HTMLTextAreaElement ||
+          document.activeElement instanceof HTMLInputElement) {
+        return;
+      }
       if (!this.keysDown.has(e.code)) this.keysPressed.add(e.code);
       this.keysDown.add(e.code);
       e.preventDefault();

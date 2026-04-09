@@ -100,8 +100,8 @@ class DemoScene extends Scene {
   private btnEntityId = 0;
 
   private createUI(): void {
-    const sw = this.engine.canvas.width;
-    const sh = this.engine.canvas.height;
+    const sw = this.engine.cssWidth;
+    const sh = this.engine.cssHeight;
 
     const panel = this.world.createEntity();
     this.world.addComponent(panel.id, new UITransform(sw / 2 - 170, 20));
