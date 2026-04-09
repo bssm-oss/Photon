@@ -1,10 +1,10 @@
 {
-  "name": "create-photon",
+  "name": "create-photon-engine",
   "version": "0.1.0",
   "description": "Scaffold a new Photon Engine project",
   "type": "module",
   "bin": {
-    "create-photon": "./dist/index.js"
+    "create-photon-engine": "./dist/index.js"
   },
   "files": ["dist", "templates"],
   "scripts": {
