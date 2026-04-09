@@ -1,9 +1,16 @@
 import { World, Entity, Archetype, Component, ComponentType } from "../ecs";
+import type { Engine } from "../core/Engine";
 
 export abstract class Scene {
-  readonly world = new World();
+  readonly world: World;
+  engine!: Engine;
 
   abstract readonly name: string;
+
+  constructor() {
+    this.world = new World();
+    this.world.scene = this;
+  }
 
   abstract onEnter(): void;
   abstract onUpdate(dt: number): void;

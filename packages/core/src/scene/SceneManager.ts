@@ -1,16 +1,20 @@
 import { Scene } from "./Scene";
 import { EventBus } from "../event/EventBus";
+import type { Engine } from "../core/Engine";
 
 export class SceneManager {
   private scenes = new Map<string, Scene>();
   private current: Scene | null = null;
   private bus: EventBus;
+  private engine: Engine;
 
-  constructor(bus?: EventBus) {
+  constructor(bus?: EventBus, engine?: Engine) {
     this.bus = bus ?? new EventBus();
+    this.engine = engine!;
   }
 
   register(scene: Scene): void {
+    scene.engine = this.engine;
     this.scenes.set(scene.name, scene);
   }
 
@@ -31,6 +35,7 @@ export class SceneManager {
     }
 
     this.current = scene;
+    this.current.engine = this.engine;
     this.current.onEnter();
     this.bus.emit("scene:switched", name);
 

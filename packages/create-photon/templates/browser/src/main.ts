@@ -1,5 +1,7 @@
 import {
   Engine, Scene, Transform2D, Camera2D, Sprite, Component,
+  UITransform, UIText, UIButton, UITextInput, UIPanel,
+  UIRenderSystem, Align,
 } from "photon-engine";
 
 class OrbitalSpeed extends Component {
@@ -12,14 +14,19 @@ class OrbitalSpeed extends Component {
   ) { super(); }
 }
 
-class AtomScene extends Scene {
-  readonly name = "atom";
+class DemoScene extends Scene {
+  readonly name = "demo";
+  private uiSystem = new UIRenderSystem();
+  private clickCount = 0;
+  private scoreTextEntityId = 0;
+  private nameTextEntityId = 0;
 
   onEnter(): void {
+    this.world.registerSystem(this.uiSystem);
+
     const cam = this.world.createEntity();
     this.world.addComponent(cam.id, new Transform2D());
     const camComp = new Camera2D();
-    camComp.zoom = 1;
     this.world.addComponent(cam.id, camComp);
 
     const nucleus = this.world.createEntity().tag("nucleus");
@@ -65,18 +72,80 @@ class AtomScene extends Scene {
       this.world.addComponent(electron.id, new Sprite(
         orbit.color[0], orbit.color[1], orbit.color[2], 1, orbit.size, orbit.size
       ));
-
-      const eGlow = this.world.createEntity().tag("electron-glow");
-      const egPos = new Transform2D();
-      egPos.zIndex = 4;
-      this.world.addComponent(eGlow.id, egPos);
-      this.world.addComponent(eGlow.id, new OrbitalSpeed(
-        orbit.radius, orbit.speed, orbit.offset, orbit.tilt
-      ));
-      this.world.addComponent(eGlow.id, new Sprite(
-        orbit.color[0], orbit.color[1], orbit.color[2], 0.2, orbit.size * 4, orbit.size * 4
-      ));
     }
+
+    this.createUI();
+
+    this.world.eventBus.on<number>("ui:click", (entityId) => {
+      if (entityId === this.btnEntityId) {
+        this.clickCount++;
+        const arch = this.world.getArchetype(this.scoreTextEntityId);
+        if (arch) {
+          const t = arch.get<UIText>("uiText")!;
+          t.text = `Clicks: ${this.clickCount}`;
+        }
+      }
+    });
+
+    this.world.eventBus.on<{ entityId: number; value: string }>("ui:change", (data) => {
+      if (data.entityId === this.nameTextEntityId) {
+        const arch = this.world.getArchetype(this.nameTextEntityId);
+        if (arch) {
+          const t = arch.get<UIText>("uiText")!;
+        }
+      }
+    });
+  }
+
+  private btnEntityId = 0;
+
+  private createUI(): void {
+    const sw = this.engine.canvas.width;
+    const sh = this.engine.canvas.height;
+
+    const panel = this.world.createEntity();
+    this.world.addComponent(panel.id, new UITransform(sw / 2 - 170, 20));
+    this.world.addComponent(panel.id, new UIPanel(340, 200, 0.08, 0.08, 0.1, 0.85, 8));
+
+    const title = this.world.createEntity();
+    this.world.addComponent(title.id, new UITransform(sw / 2, 40));
+    this.world.addComponent(title.id, new UIText(
+      "Photon Engine UI Demo", "sans-serif", 20, 0.5, 0.7, 1, 1, Align.Center, true,
+    ));
+
+    const score = this.world.createEntity();
+    this.world.addComponent(score.id, new UITransform(sw / 2 - 150, 75));
+    this.scoreTextEntityId = score.id;
+    this.world.addComponent(score.id, new UIText("Clicks: 0", "monospace", 16, 1, 1, 1, 1));
+
+    const btn = this.world.createEntity();
+    this.btnEntityId = btn.id;
+    this.world.addComponent(btn.id, new UITransform(sw / 2 - 80, 105));
+    this.world.addComponent(btn.id, new UIButton(
+      160, 40, "Click Me!",
+      0.16, 0.5, 1, 1,
+      0.29, 0.62, 1, 1,
+      0.1, 0.37, 0.8, 1,
+      8, 16, true,
+    ));
+
+    const nameLabel = this.world.createEntity();
+    this.world.addComponent(nameLabel.id, new UITransform(sw / 2 - 150, 158));
+    this.world.addComponent(nameLabel.id, new UIText("Name:", "sans-serif", 14, 0.7, 0.7, 0.7, 1));
+
+    const nameInput = this.world.createEntity();
+    this.nameTextEntityId = nameInput.id;
+    this.world.addComponent(nameInput.id, new UITransform(sw / 2 - 100, 155));
+    this.world.addComponent(nameInput.id, new UITextInput(
+      200, 28, "Type here...", 64,
+      0.12, 0.12, 0.14, 1,
+      0.3, 0.3, 0.3, 1,
+      0.3, 0.6, 1, 1,
+      14,
+    ));
+    this.world.addComponent(nameInput.id, new UIText(
+      "", "sans-serif", 14, 1, 1, 1, 1,
+    ));
   }
 
   onUpdate(): void {
@@ -119,6 +188,6 @@ class AtomScene extends Scene {
 }
 
 const engine = new Engine({ canvasId: "game-canvas" });
-engine.sceneManager.register(new AtomScene());
-engine.sceneManager.switchTo("atom");
+engine.sceneManager.register(new DemoScene());
+engine.sceneManager.switchTo("demo");
 engine.start();

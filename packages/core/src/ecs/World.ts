@@ -3,12 +3,14 @@ import { Archetype } from "./Archetype";
 import { System } from "./System";
 import { Component, ComponentType } from "./Component";
 import { EventBus } from "../event/EventBus";
+import type { Scene } from "../scene/Scene";
 
 export class World {
   private archetypes = new Map<number, Archetype>();
   private systems: System[] = [];
   private entityRecycleBin: number[] = [];
   private bus = new EventBus();
+  scene?: Scene;
 
   createEntity(): Entity {
     const id = this.entityRecycleBin.length > 0
@@ -49,6 +51,22 @@ export class World {
 
   getComponent<T extends Component>(entityId: number, type: ComponentType): T | undefined {
     return this.archetypes.get(entityId)?.get<T>(type);
+  }
+
+  getEntity(entityId: number): Entity | undefined {
+    return this.archetypes.get(entityId)?.entity;
+  }
+
+  hasEntity(entityId: number): boolean {
+    return this.archetypes.has(entityId);
+  }
+
+  getAllEntities(): Entity[] {
+    const result: Entity[] = [];
+    for (const [, arch] of this.archetypes) {
+      result.push(arch.entity);
+    }
+    return result;
   }
 
   registerSystem(system: System): void {

@@ -47,7 +47,7 @@ export class Engine {
     this.eventBus = new EventBus();
     this.renderer = new Renderer(canvas);
     this.input = new InputManager(canvas);
-    this.sceneManager = new SceneManager(this.eventBus);
+    this.sceneManager = new SceneManager(this.eventBus, this);
 
     if (config.fs) {
       this.fs = config.fs;
@@ -160,6 +160,14 @@ export class Engine {
     }
 
     this.renderer.end();
+  }
+
+  private resizeUIOverlay(): void {
+    const uiCanvas = document.getElementById("photon-ui-overlay") as HTMLCanvasElement;
+    if (uiCanvas) {
+      uiCanvas.width = this.canvas.width;
+      uiCanvas.height = this.canvas.height;
+    }
   }
 
   destroy(): void {

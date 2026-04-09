@@ -9,3 +9,4 @@ export { type IFileSystem, BrowserFileSystem } from "./filesystem";
 export { InputManager } from "./input";
 export { EventBus, globalBus } from "./event";
 export { Vec2, Mat3, Rect, Transform } from "./math";
+export { UITransform, UIText, UIButton, UITextInput, UIPanel, UIRenderSystem, Align } from "./ui";
