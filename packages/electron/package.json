@@ -1,6 +1,6 @@
 {
   "name": "photon-engine-electron",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Electron adapter for Photon Engine",
   "type": "module",
   "main": "./dist/index.js",
@@ -22,7 +22,7 @@
   },
   "peerDependencies": {
     "electron": "^28.0.0",
-    "photon-engine": ">=0.1.0"
+    "photon-engine": ">=0.1.0-0"
   },
   "devDependencies": {
     "photon-engine": "file:../core",
