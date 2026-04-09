@@ -7,6 +7,7 @@ import { UIText, Align } from "./UIText";
 import { UITextInput } from "./UITextInput";
 import { UIPanel } from "./UIPanel";
 import { EventBus } from "../event/EventBus";
+import { InputPriority } from "../input/InputManager";
 import type { Engine } from "../core/Engine";
 
 function rgba(r: number, g: number, b: number, a: number): string {
@@ -30,11 +31,9 @@ export class UIRenderSystem extends System {
   private _onMouseMove!: (e: MouseEvent) => void;
   private _onMouseDown!: (e: MouseEvent) => void;
   private _onMouseUp!: (e: MouseEvent) => void;
-  private _onKeyDown!: (e: KeyboardEvent) => void;
   private _onResize!: () => void;
   private _onInput!: () => void;
   private _onBlur!: () => void;
-
   private _onCompositionStart!: () => void;
   private _onCompositionEnd!: (e: CompositionEvent) => void;
 
@@ -60,13 +59,11 @@ export class UIRenderSystem extends System {
       const r = this.engine.canvas.getBoundingClientRect();
       this.handleMouseUp(e.clientX - r.left, e.clientY - r.top, e.button);
     };
-    this._onKeyDown = (e: KeyboardEvent) => this.handleKeyDown(e);
     this._onResize = () => this.syncSize();
 
     this.engine.canvas.addEventListener("mousemove", this._onMouseMove);
     this.engine.canvas.addEventListener("mousedown", this._onMouseDown);
     this.engine.canvas.addEventListener("mouseup", this._onMouseUp);
-    window.addEventListener("keydown", this._onKeyDown);
     window.addEventListener("resize", this._onResize);
   }
 
@@ -119,13 +116,29 @@ export class UIRenderSystem extends System {
   }
 
   private isComposing = false;
+  private holderId: string;
+
+  constructor() {
+    super();
+    this.holderId = `ui-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  }
 
   private focusInput(entityId: number): void {
     this.focusedId = entityId;
     this.textareaEntityId = entityId;
-    this.hiddenTextarea.value = "";
-    this.hiddenTextarea.focus();
     this.isComposing = false;
+
+    const scene = this.engine.sceneManager.currentScene;
+    if (scene) {
+      const arch = scene.world.getArchetype(entityId);
+      const txt = arch?.get<UIText>("uiText");
+      this.hiddenTextarea.value = txt?.text ?? "";
+    } else {
+      this.hiddenTextarea.value = "";
+    }
+
+    this.engine.input.capture(this.holderId, InputPriority.UI);
+    this.hiddenTextarea.focus();
     this.bus.emit("ui:focus", entityId);
   }
 
@@ -133,6 +146,7 @@ export class UIRenderSystem extends System {
     if (this.textareaEntityId !== null) {
       this.bus.emit("ui:blur", this.textareaEntityId);
     }
+    this.engine.input.release(this.holderId);
     this.textareaEntityId = null;
     this.focusedId = null;
     this.isComposing = false;
@@ -140,7 +154,8 @@ export class UIRenderSystem extends System {
   }
 
   private handleTextareaInput(): void {
-    if (this.textareaEntityId === null || this.isComposing) return;
+    if (this.textareaEntityId === null) return;
+
     const scene = this.engine.sceneManager.currentScene;
     if (!scene) return;
 
@@ -153,13 +168,12 @@ export class UIRenderSystem extends System {
 
     const prev = txt.text;
     txt.text = this.hiddenTextarea.value.slice(0, input.maxLength);
-    this.hiddenTextarea.value = txt.text;
     if (txt.text !== prev) {
       this.bus.emit("ui:change", { entityId: this.textareaEntityId, value: txt.text });
     }
   }
 
-  private handleCompositionEnd(e: CompositionEvent): void {
+  private handleCompositionEnd(_e: CompositionEvent): void {
     this.isComposing = false;
     this.handleTextareaInput();
   }
@@ -448,10 +462,11 @@ export class UIRenderSystem extends System {
   }
 
   onDestroy(_world: World): void {
+    this.blurFocusedInput();
+    this.engine.input.release(this.holderId);
     this.engine.canvas.removeEventListener("mousemove", this._onMouseMove);
     this.engine.canvas.removeEventListener("mousedown", this._onMouseDown);
     this.engine.canvas.removeEventListener("mouseup", this._onMouseUp);
-    window.removeEventListener("keydown", this._onKeyDown);
     window.removeEventListener("resize", this._onResize);
     this.hiddenTextarea.removeEventListener("input", this._onInput);
     this.hiddenTextarea.removeEventListener("blur", this._onBlur);

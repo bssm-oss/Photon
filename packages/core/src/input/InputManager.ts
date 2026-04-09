@@ -1,4 +1,7 @@
 import { Vec2 } from "../math/Vec2";
+import { InputCaptureStack, InputPriority } from "./InputCaptureStack";
+
+export { InputPriority, InputCaptureStack };
 
 export class InputManager {
   private keysDown = new Set<string>();
@@ -12,6 +15,8 @@ export class InputManager {
   private scrollDelta = 0;
 
   private bound = false;
+  private captureStack = new InputCaptureStack();
+
   private keyDownHandler: (e: KeyboardEvent) => void;
   private keyUpHandler: (e: KeyboardEvent) => void;
   private mouseMoveHandler: (e: MouseEvent) => void;
@@ -21,15 +26,13 @@ export class InputManager {
 
   constructor(private canvas: HTMLCanvasElement) {
     this.keyDownHandler = (e) => {
-      if (document.activeElement instanceof HTMLTextAreaElement ||
-          document.activeElement instanceof HTMLInputElement) {
-        return;
-      }
+      if (this.captureStack.isCaptured()) return;
       if (!this.keysDown.has(e.code)) this.keysPressed.add(e.code);
       this.keysDown.add(e.code);
       e.preventDefault();
     };
     this.keyUpHandler = (e) => {
+      if (this.captureStack.isCaptured()) return;
       this.keysDown.delete(e.code);
       this.keysReleased.add(e.code);
     };
@@ -41,16 +44,39 @@ export class InputManager {
       this.mousePos = new Vec2(nx, ny);
     };
     this.mouseDownHandler = (e) => {
+      if (this.captureStack.isCaptured()) return;
       if (!this.mouseButtonsDown.has(e.button)) this.mouseButtonsPressed.add(e.button);
       this.mouseButtonsDown.add(e.button);
     };
     this.mouseUpHandler = (e) => {
+      if (this.captureStack.isCaptured()) return;
       this.mouseButtonsDown.delete(e.button);
       this.mouseButtonsReleased.add(e.button);
     };
     this.wheelHandler = (e) => {
+      if (this.captureStack.isCaptured()) return;
       this.scrollDelta = e.deltaY;
     };
+  }
+
+  capture(holderId: string, priority: InputPriority = InputPriority.UI): boolean {
+    return this.captureStack.request(holderId, priority);
+  }
+
+  release(holderId: string): void {
+    this.captureStack.release(holderId);
+  }
+
+  hasOwnership(holderId: string): boolean {
+    return this.captureStack.hasOwnership(holderId);
+  }
+
+  isCaptured(): boolean {
+    return this.captureStack.isCaptured();
+  }
+
+  getCurrentHolder(): string | null {
+    return this.captureStack.getCurrentHolder();
   }
 
   init(): void {
@@ -73,6 +99,7 @@ export class InputManager {
     this.canvas.removeEventListener("mousedown", this.mouseDownHandler);
     this.canvas.removeEventListener("mouseup", this.mouseUpHandler);
     this.canvas.removeEventListener("wheel", this.wheelHandler);
+    this.captureStack.clear();
   }
 
   endFrame(): void {
@@ -84,15 +111,40 @@ export class InputManager {
     this.scrollDelta = 0;
   }
 
-  isKeyDown(code: string): boolean { return this.keysDown.has(code); }
-  isKeyPressed(code: string): boolean { return this.keysPressed.has(code); }
-  isKeyReleased(code: string): boolean { return this.keysReleased.has(code); }
+  isKeyDown(code: string): boolean {
+    if (this.captureStack.isCaptured()) return false;
+    return this.keysDown.has(code);
+  }
 
-  isMouseButtonDown(btn: number = 0): boolean { return this.mouseButtonsDown.has(btn); }
-  isMouseButtonPressed(btn: number = 0): boolean { return this.mouseButtonsPressed.has(btn); }
-  isMouseButtonReleased(btn: number = 0): boolean { return this.mouseButtonsReleased.has(btn); }
+  isKeyPressed(code: string): boolean {
+    if (this.captureStack.isCaptured()) return false;
+    return this.keysPressed.has(code);
+  }
+
+  isKeyReleased(code: string): boolean {
+    if (this.captureStack.isCaptured()) return false;
+    return this.keysReleased.has(code);
+  }
+
+  isMouseButtonDown(btn: number = 0): boolean {
+    if (this.captureStack.isCaptured()) return false;
+    return this.mouseButtonsDown.has(btn);
+  }
+
+  isMouseButtonPressed(btn: number = 0): boolean {
+    if (this.captureStack.isCaptured()) return false;
+    return this.mouseButtonsPressed.has(btn);
+  }
+
+  isMouseButtonReleased(btn: number = 0): boolean {
+    if (this.captureStack.isCaptured()) return false;
+    return this.mouseButtonsReleased.has(btn);
+  }
 
   get mousePosition(): Vec2 { return this.mousePos.clone(); }
   get mouseDeltaPosition(): Vec2 { return this.mouseDelta.clone(); }
-  get scrollY(): number { return this.scrollDelta; }
+  get scrollY(): number {
+    if (this.captureStack.isCaptured()) return 0;
+    return this.scrollDelta;
+  }
 }

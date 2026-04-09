@@ -87,7 +87,7 @@ class DemoScene extends Scene {
     this.world.eventBus.on<number>("ui:click", (entityId) => {
       if (entityId === this.btnId) {
         this.clickCount++;
-        const arch = this.world.getArchetype(this.scoreTextId);
+        const arch = this.world.getArchetype(this.scoreId);
         if (arch) {
           const t = arch.get<UIText>("uiText")!;
           t.text = `Clicks: ${this.clickCount}`;
@@ -146,22 +146,46 @@ class DemoScene extends Scene {
     const sh = this.engine.cssHeight;
 
     const archPanel = this.world.getArchetype(this.panelId);
-    if (archPanel) archPanel.get<UITransform>("uiTransform")!.x = sw / 2 - 170;
+    if (archPanel) {
+      const t = archPanel.get<UITransform>("uiTransform")!;
+      t.x = sw / 2 - 170;
+      t.y = 20;
+    }
 
     const archTitle = this.world.getArchetype(this.titleId);
-    if (archTitle) archTitle.get<UITransform>("uiTransform")!.x = sw / 2;
+    if (archTitle) {
+      const t = archTitle.get<UITransform>("uiTransform")!;
+      t.x = sw / 2;
+      t.y = 40;
+    }
 
     const archScore = this.world.getArchetype(this.scoreId);
-    if (archScore) archScore.get<UITransform>("uiTransform")!.x = sw / 2 - 150;
+    if (archScore) {
+      const t = archScore.get<UITransform>("uiTransform")!;
+      t.x = sw / 2 - 150;
+      t.y = 75;
+    }
 
     const archBtn = this.world.getArchetype(this.btnId);
-    if (archBtn) archBtn.get<UITransform>("uiTransform")!.x = sw / 2 - 80;
+    if (archBtn) {
+      const t = archBtn.get<UITransform>("uiTransform")!;
+      t.x = sw / 2 - 80;
+      t.y = 105;
+    }
 
     const archLabel = this.world.getArchetype(this.labelId);
-    if (archLabel) archLabel.get<UITransform>("uiTransform")!.x = sw / 2 - 150;
+    if (archLabel) {
+      const t = archLabel.get<UITransform>("uiTransform")!;
+      t.x = sw / 2 - 150;
+      t.y = 160;
+    }
 
     const archInput = this.world.getArchetype(this.inputId);
-    if (archInput) archInput.get<UITransform>("uiTransform")!.x = sw / 2 - 100;
+    if (archInput) {
+      const t = archInput.get<UITransform>("uiTransform")!;
+      t.x = sw / 2 - 100;
+      t.y = 157;
+    }
   }
 
   onUpdate(): void {
