@@ -1,6 +1,6 @@
 {
   "name": "create-photon-engine",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Scaffold a new Photon Engine project",
   "type": "module",
   "bin": {
