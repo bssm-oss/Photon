@@ -27,10 +27,6 @@ export class InputCaptureStack {
       timestamp: this.counter++,
     };
 
-    const insertIdx = this.stack.findIndex(
-      (e) => e.priority < priority || (e.priority === priority && false),
-    );
-
     this.stack.push(entry);
     this.stack.sort((a, b) => {
       if (a.priority !== b.priority) return b.priority - a.priority;

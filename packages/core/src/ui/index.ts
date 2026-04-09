@@ -4,3 +4,7 @@ export { UIButton } from "./UIButton";
 export { UITextInput } from "./UITextInput";
 export { UIPanel } from "./UIPanel";
 export { UIRenderSystem } from "./UIRenderSystem";
+export { parsePui, PuiSyntaxError } from "./pui/PuiParser";
+export { loadPui, type PuiLoadResult } from "./pui/PuiLoader";
+export { loadPuiFile } from "./pui/PuiFile";
+export type { PuiDocument, PuiNode, PuiValue } from "./pui/PuiTypes";

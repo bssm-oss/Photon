@@ -31,11 +31,15 @@ export class UIRenderSystem extends System {
   private _onMouseMove!: (e: MouseEvent) => void;
   private _onMouseDown!: (e: MouseEvent) => void;
   private _onMouseUp!: (e: MouseEvent) => void;
+  private _onKeyDown!: (e: KeyboardEvent) => void;
   private _onResize!: () => void;
   private _onInput!: () => void;
   private _onBlur!: () => void;
   private _onCompositionStart!: () => void;
   private _onCompositionEnd!: (e: CompositionEvent) => void;
+
+  private logicalW = 0;
+  private logicalH = 0;
 
   onInit(world: World): void {
     if (!world.scene?.engine) {
@@ -54,17 +58,21 @@ export class UIRenderSystem extends System {
     this._onMouseDown = (e: MouseEvent) => {
       const r = this.engine.canvas.getBoundingClientRect();
       this.handleMouseDown(e.clientX - r.left, e.clientY - r.top, e.button);
+      // Prevent the browser from blurring the hidden textarea when clicking the canvas
+      e.preventDefault();
     };
     this._onMouseUp = (e: MouseEvent) => {
       const r = this.engine.canvas.getBoundingClientRect();
       this.handleMouseUp(e.clientX - r.left, e.clientY - r.top, e.button);
     };
     this._onResize = () => this.syncSize();
+    this._onKeyDown = (e: KeyboardEvent) => this.handleKeyDown(e);
 
     this.engine.canvas.addEventListener("mousemove", this._onMouseMove);
     this.engine.canvas.addEventListener("mousedown", this._onMouseDown);
     this.engine.canvas.addEventListener("mouseup", this._onMouseUp);
     window.addEventListener("resize", this._onResize);
+    window.addEventListener("keydown", this._onKeyDown);
   }
 
   private setupOverlay(): void {
@@ -84,12 +92,12 @@ export class UIRenderSystem extends System {
   private syncSize(): void {
     const dpr = this.engine.pixelRatio;
     const rect = this.engine.canvas.getBoundingClientRect();
-    const w = rect.width;
-    const h = rect.height;
-    this.overlay.width = Math.round(w * dpr);
-    this.overlay.height = Math.round(h * dpr);
-    this.overlay.style.width = w + "px";
-    this.overlay.style.height = h + "px";
+    this.logicalW = rect.width;
+    this.logicalH = rect.height;
+    this.overlay.width = Math.round(this.logicalW * dpr);
+    this.overlay.height = Math.round(this.logicalH * dpr);
+    this.overlay.style.width = this.logicalW + "px";
+    this.overlay.style.height = this.logicalH + "px";
     this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
 
@@ -144,6 +152,12 @@ export class UIRenderSystem extends System {
 
   private blurFocusedInput(): void {
     if (this.textareaEntityId !== null) {
+      const scene = this.engine.sceneManager.currentScene;
+      if (scene) {
+        const arch = scene.world.getArchetype(this.textareaEntityId);
+        const inp = arch?.get<UITextInput>("uiTextInput");
+        if (inp) inp.focused = false;
+      }
       this.bus.emit("ui:blur", this.textareaEntityId);
     }
     this.engine.input.release(this.holderId);
@@ -231,11 +245,14 @@ export class UIRenderSystem extends System {
     if (!scene) return;
 
     const all = scene.world.query("uiTransform");
+    let hitSomething = false;
+
     for (let i = all.length - 1; i >= 0; i--) {
       const arch = all[i];
       const ui = arch.get<UITransform>("uiTransform");
       if (!ui?.containsPoint(mx, my)) continue;
 
+      hitSomething = true;
       const btn = arch.get<UIButton>("uiButton");
       const input = arch.get<UITextInput>("uiTextInput");
 
@@ -253,6 +270,10 @@ export class UIRenderSystem extends System {
 
       this.focusedId = arch.entity.id;
       break;
+    }
+
+    if (!hitSomething && this.textareaEntityId !== null) {
+      this.blurFocusedInput();
     }
   }
 
@@ -283,10 +304,14 @@ export class UIRenderSystem extends System {
   }
 
   onUpdate(_world: World, archetypes: Archetype[], dt: number): void {
-    this.syncSize();
     const ctx = this.ctx;
-    const rect = this.engine.canvas.getBoundingClientRect();
-    ctx.clearRect(0, 0, rect.width, rect.height);
+    ctx.clearRect(0, 0, this.logicalW, this.logicalH);
+
+    archetypes.sort((a, b) => {
+      const za = a.get<UITransform>("uiTransform")?.zIndex ?? 0;
+      const zb = b.get<UITransform>("uiTransform")?.zIndex ?? 0;
+      return za - zb;
+    });
 
     for (const arch of archetypes) {
       const ui = arch.get<UITransform>("uiTransform");
@@ -472,6 +497,7 @@ export class UIRenderSystem extends System {
     this.hiddenTextarea.removeEventListener("blur", this._onBlur);
     this.hiddenTextarea.removeEventListener("compositionstart", this._onCompositionStart);
     this.hiddenTextarea.removeEventListener("compositionend", this._onCompositionEnd);
+    window.removeEventListener("keydown", this._onKeyDown);
     this.hiddenTextarea.remove();
     this.overlay.remove();
   }

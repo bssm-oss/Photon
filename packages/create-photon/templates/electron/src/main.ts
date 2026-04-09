@@ -1,7 +1,8 @@
+import puiSource from "./hud.pui?raw";
 import {
   Engine, Scene, Transform2D, Camera2D, Sprite, Component,
-  UITransform, UIText, UIButton, UITextInput, UIPanel,
-  UIRenderSystem, Align,
+  UIText, UIRenderSystem,
+  parsePui, loadPui,
 } from "photon-engine";
 import { ElectronNativeBridge } from "photon-engine-electron";
 
@@ -19,23 +20,15 @@ class DemoScene extends Scene {
   readonly name = "demo";
   private uiSystem = new UIRenderSystem();
   private clickCount = 0;
-
-  private panelId = 0;
-  private titleId = 0;
   private scoreId = 0;
-  private scoreTextId = 0;
   private btnId = 0;
-  private labelId = 0;
-  private inputId = 0;
-  private inputTextId = 0;
 
   onEnter(): void {
     this.world.registerSystem(this.uiSystem);
 
     const cam = this.world.createEntity();
     this.world.addComponent(cam.id, new Transform2D());
-    const camComp = new Camera2D();
-    this.world.addComponent(cam.id, camComp);
+    this.world.addComponent(cam.id, new Camera2D());
 
     const nucleus = this.world.createEntity().tag("nucleus");
     const nPos = new Transform2D();
@@ -50,9 +43,9 @@ class DemoScene extends Scene {
     this.world.addComponent(glow.id, new Sprite(0.9, 0.5, 0.1, 0.15, 60, 60));
 
     const orbits = [
-      { radius: 80,  speed: 2.0, tilt: 0,            color: [0.3, 0.7, 1.0], size: 8, offset: 0 },
-      { radius: 130, speed: 1.3, tilt: Math.PI / 3,   color: [0.4, 1.0, 0.6], size: 7, offset: Math.PI * 0.66 },
-      { radius: 180, speed: 0.8, tilt: -Math.PI / 4,  color: [1.0, 0.4, 0.8], size: 6, offset: Math.PI * 1.33 },
+      { radius: 80,  speed: 2.0, tilt: 0,           color: [0.3, 0.7, 1.0], size: 8, offset: 0 },
+      { radius: 130, speed: 1.3, tilt: Math.PI / 3,  color: [0.4, 1.0, 0.6], size: 7, offset: Math.PI * 0.66 },
+      { radius: 180, speed: 0.8, tilt: -Math.PI / 4, color: [1.0, 0.4, 0.8], size: 6, offset: Math.PI * 1.33 },
     ];
 
     for (const orbit of orbits) {
@@ -63,10 +56,10 @@ class DemoScene extends Scene {
         dPos.zIndex = 1;
         this.world.addComponent(dot.id, dPos);
         this.world.addComponent(dot.id, new OrbitalSpeed(
-          orbit.radius, 0, (i / ringCount) * Math.PI * 2, orbit.tilt
+          orbit.radius, 0, (i / ringCount) * Math.PI * 2, orbit.tilt,
         ));
         this.world.addComponent(dot.id, new Sprite(
-          orbit.color[0] * 0.3, orbit.color[1] * 0.3, orbit.color[2] * 0.3, 0.25, 2, 2
+          orbit.color[0] * 0.3, orbit.color[1] * 0.3, orbit.color[2] * 0.3, 0.25, 2, 2,
         ));
       }
 
@@ -75,132 +68,39 @@ class DemoScene extends Scene {
       ePos.zIndex = 5;
       this.world.addComponent(electron.id, ePos);
       this.world.addComponent(electron.id, new OrbitalSpeed(
-        orbit.radius, orbit.speed, orbit.offset, orbit.tilt
+        orbit.radius, orbit.speed, orbit.offset, orbit.tilt,
       ));
       this.world.addComponent(electron.id, new Sprite(
-        orbit.color[0], orbit.color[1], orbit.color[2], 1, orbit.size, orbit.size
+        orbit.color[0], orbit.color[1], orbit.color[2], 1, orbit.size, orbit.size,
       ));
     }
 
-    this.createUI();
-    this.layoutUI();
+    // Load UI from hud.pui
+    const ui = loadPui(this.world, parsePui(puiSource));
+    this.scoreId = ui.entities.get("score")!;
+    this.btnId   = ui.entities.get("clickBtn")!;
 
     this.world.eventBus.on<number>("ui:click", (entityId) => {
       if (entityId === this.btnId) {
         this.clickCount++;
         const arch = this.world.getArchetype(this.scoreId);
         if (arch) {
-          const t = arch.get<UIText>("uiText")!;
-          t.text = `Clicks: ${this.clickCount}`;
+          arch.get<UIText>("uiText")!.text = `Clicks: ${this.clickCount}`;
         }
       }
     });
-
-    this.engine.eventBus.on("engine:resize", () => this.layoutUI());
-  }
-
-  private createUI(): void {
-    this.panelId = this.world.createEntity().id;
-    this.world.addComponent(this.panelId, new UITransform(0, 0));
-    this.world.addComponent(this.panelId, new UIPanel(340, 180, 0.08, 0.08, 0.1, 0.85, 8));
-
-    this.titleId = this.world.createEntity().id;
-    this.world.addComponent(this.titleId, new UITransform(0, 0));
-    this.world.addComponent(this.titleId, new UIText(
-      "Photon Engine — Electron", "sans-serif", 20, 0.5, 0.7, 1, 1, Align.Center, true,
-    ));
-
-    this.scoreId = this.world.createEntity().id;
-    this.world.addComponent(this.scoreId, new UITransform(0, 0));
-    this.world.addComponent(this.scoreId, new UIText("Clicks: 0", "monospace", 16, 1, 1, 1, 1));
-
-    this.btnId = this.world.createEntity().id;
-    this.world.addComponent(this.btnId, new UITransform(0, 0));
-    this.world.addComponent(this.btnId, new UIButton(
-      160, 40, "Click Me!",
-      0.16, 0.5, 1, 1,
-      0.29, 0.62, 1, 1,
-      0.1, 0.37, 0.8, 1,
-      8, 16, true,
-    ));
-
-    this.labelId = this.world.createEntity().id;
-    this.world.addComponent(this.labelId, new UITransform(0, 0));
-    this.world.addComponent(this.labelId, new UIText("Name:", "sans-serif", 14, 0.7, 0.7, 0.7, 1));
-
-    this.inputId = this.world.createEntity().id;
-    this.world.addComponent(this.inputId, new UITransform(0, 0));
-    this.world.addComponent(this.inputId, new UITextInput(
-      200, 28, "Type here...", 64,
-      0.12, 0.12, 0.14, 1,
-      0.3, 0.3, 0.3, 1,
-      0.3, 0.6, 1, 1,
-      14,
-    ));
-    this.world.addComponent(this.inputId, new UIText(
-      "", "sans-serif", 14, 1, 1, 1, 1,
-    ));
-  }
-
-  private layoutUI(): void {
-    const sw = this.engine.cssWidth;
-    const sh = this.engine.cssHeight;
-
-    const archPanel = this.world.getArchetype(this.panelId);
-    if (archPanel) {
-      const t = archPanel.get<UITransform>("uiTransform")!;
-      t.x = sw / 2 - 170;
-      t.y = 20;
-    }
-
-    const archTitle = this.world.getArchetype(this.titleId);
-    if (archTitle) {
-      const t = archTitle.get<UITransform>("uiTransform")!;
-      t.x = sw / 2;
-      t.y = 40;
-    }
-
-    const archScore = this.world.getArchetype(this.scoreId);
-    if (archScore) {
-      const t = archScore.get<UITransform>("uiTransform")!;
-      t.x = sw / 2 - 150;
-      t.y = 75;
-    }
-
-    const archBtn = this.world.getArchetype(this.btnId);
-    if (archBtn) {
-      const t = archBtn.get<UITransform>("uiTransform")!;
-      t.x = sw / 2 - 80;
-      t.y = 105;
-    }
-
-    const archLabel = this.world.getArchetype(this.labelId);
-    if (archLabel) {
-      const t = archLabel.get<UITransform>("uiTransform")!;
-      t.x = sw / 2 - 150;
-      t.y = 160;
-    }
-
-    const archInput = this.world.getArchetype(this.inputId);
-    if (archInput) {
-      const t = archInput.get<UITransform>("uiTransform")!;
-      t.x = sw / 2 - 100;
-      t.y = 157;
-    }
   }
 
   onUpdate(): void {
     const time = performance.now() * 0.001;
-    const entities = this.world.query("transform2d", "orbitalSpeed");
 
-    for (const arch of entities) {
+    for (const arch of this.world.query("transform2d", "orbitalSpeed")) {
       const t = arch.get<Transform2D>("transform2d")!;
       const o = arch.get<OrbitalSpeed>("orbitalSpeed")!;
 
       const angle = o.angleOffset + time * o.speed;
       const x = Math.cos(angle) * o.radius;
       const y = Math.sin(angle) * o.radius * 0.4;
-
       const cosT = Math.cos(o.orbitTilt);
       const sinT = Math.sin(o.orbitTilt);
       t.x = x * cosT - y * sinT;
@@ -209,19 +109,19 @@ class DemoScene extends Scene {
 
     const nucleusArch = this.world.queryByTag("nucleus")[0];
     if (nucleusArch) {
-      const nSprite = nucleusArch.get<Sprite>("sprite")!;
+      const s = nucleusArch.get<Sprite>("sprite")!;
       const pulse = 28 + Math.sin(time * 3) * 4;
-      nSprite.width = pulse;
-      nSprite.height = pulse;
+      s.width = pulse;
+      s.height = pulse;
     }
 
     const glowArch = this.world.queryByTag("glow")[0];
     if (glowArch) {
-      const gSprite = glowArch.get<Sprite>("sprite")!;
+      const s = glowArch.get<Sprite>("sprite")!;
       const pulse = 60 + Math.sin(time * 2) * 10;
-      gSprite.width = pulse;
-      gSprite.height = pulse;
-      gSprite.colorA = 0.12 + Math.sin(time * 3) * 0.05;
+      s.width = pulse;
+      s.height = pulse;
+      s.colorA = 0.12 + Math.sin(time * 3) * 0.05;
     }
   }
 

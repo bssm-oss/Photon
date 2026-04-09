@@ -1,6 +1,6 @@
 {
   "name": "photon-engine",
-  "version": "0.2.1-alpha",
+  "version": "0.3.0-rc.1",
   "description": "Lightweight 2D game engine with ECS architecture",
   "type": "module",
   "main": "./dist/index.js",

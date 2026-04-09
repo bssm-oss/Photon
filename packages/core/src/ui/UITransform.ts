@@ -3,6 +3,8 @@ import { Component } from "../ecs";
 export class UITransform extends Component {
   readonly type = "uiTransform";
 
+  public zIndex: number = 0;
+
   constructor(
     public x: number = 0,
     public y: number = 0,

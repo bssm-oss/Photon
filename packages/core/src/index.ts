@@ -10,3 +10,4 @@ export { InputManager } from "./input";
 export { EventBus, globalBus } from "./event";
 export { Vec2, Mat3, Rect, Transform } from "./math";
 export { UITransform, UIText, UIButton, UITextInput, UIPanel, UIRenderSystem, Align } from "./ui";
+export { parsePui, loadPui, loadPuiFile, PuiSyntaxError, type PuiDocument, type PuiNode, type PuiValue, type PuiLoadResult } from "./ui";
