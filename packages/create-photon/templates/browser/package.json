@@ -1,14 +1,14 @@
 {
   "name": "photon-template-browser",
   "private": true,
-  "versphoton": "0.1.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build"
   },
   "dependencies": {
-    "photon-engine": "^0.1.0"
+    "photon-engine": "^0.1.1"
   },
   "devDependencies": {
     "vite": "^6.0.0",

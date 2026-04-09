@@ -1,7 +1,7 @@
 {
   "name": "create-photon",
-  "versphoton": "0.1.0",
-  "descriptphoton": "Scaffold a new Ion Engine project",
+  "version": "0.1.0",
+  "description": "Scaffold a new Photon Engine project",
   "type": "module",
   "bin": {
     "create-photon": "./dist/index.js"
