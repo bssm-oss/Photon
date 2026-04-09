@@ -26,12 +26,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/bssm-oss/Ion.git",
+    "url": "https://github.com/bssm-oss/photon.git",
     "directory": "packages/core"
   },
-  "homepage": "https://github.com/bssm-oss/Ion#readme",
+  "homepage": "https://github.com/bssm-oss/photon#readme",
   "bugs": {
-    "url": "https://github.com/bssm-oss/Ion/issues"
+    "url": "https://github.com/bssm-oss/photon/issues"
   },
   "devDependencies": {
     "typescript": "^5.6.0",
