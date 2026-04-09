@@ -6,9 +6,7 @@ import { execSync } from "child_process";
 
 const args = process.argv.slice(2);
 const projectName = args[0] || "my-photon-game";
-const template = args.includes("--tauri") ? "tauri"
-  : args.includes("--electron") ? "electron"
-  : "browser";
+const template = args.includes("--electron") ? "electron" : "browser";
 
 const cwd = resolve(projectName);
 
@@ -17,7 +15,7 @@ if (existsSync(cwd)) {
   process.exit(1);
 }
 
-console.log(`\n  Creating Ion Engine project: ${projectName}`);
+console.log(`\n  Creating Photon Engine project: ${projectName}`);
 console.log(`  Template: ${template}\n`);
 
 mkdirSync(cwd, { recursive: true });

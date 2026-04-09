@@ -1,6 +1,6 @@
-import { IComputeBackend, Vec2 } from "ion-engine";
+import { IComputeBackend, Vec2 } from "photon-engine";
 
-export class IonCompute implements IComputeBackend {
+export class PhotonCompute implements IComputeBackend {
   async collideAABB(
     ax: number, ay: number, aw: number, ah: number,
     bx: number, by: number, bw: number, bh: number
