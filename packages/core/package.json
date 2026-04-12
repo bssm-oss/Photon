@@ -1,6 +1,6 @@
 {
   "name": "photon-engine",
-  "version": "0.3.0-rc.1",
+  "version": "1.0.0",
   "description": "Lightweight 2D game engine with ECS architecture",
   "type": "module",
   "main": "./dist/index.js",
@@ -26,12 +26,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/bssm-oss/photon.git",
+    "url": "https://github.com/BitByte08/Photon.git",
     "directory": "packages/core"
   },
-  "homepage": "https://github.com/bssm-oss/photon#readme",
+  "homepage": "https://github.com/BitByte08/Photon#readme",
   "bugs": {
-    "url": "https://github.com/bssm-oss/photon/issues"
+    "url": "https://github.com/BitByte08/Photon/issues"
   },
   "devDependencies": {
     "typescript": "^5.6.0",

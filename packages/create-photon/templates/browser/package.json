@@ -8,7 +8,7 @@
     "build": "vite build"
   },
   "dependencies": {
-    "photon-engine": "^0.1.1"
+    "photon-engine": "^1.0.0"
   },
   "devDependencies": {
     "vite": "^6.0.0",

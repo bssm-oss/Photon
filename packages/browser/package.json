@@ -1,6 +1,6 @@
 {
   "name": "photon-engine-browser",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Browser adapter for Photon Engine (OPFS filesystem, Web API bridge)",
   "type": "module",
   "main": "./dist/index.js",
@@ -19,7 +19,7 @@
     "prepublishOnly": "npm run build"
   },
   "peerDependencies": {
-    "photon-engine": "^0.1.1"
+    "photon-engine": "^1.0.0"
   },
   "devDependencies": {
     "typescript": "^5.6.0",
