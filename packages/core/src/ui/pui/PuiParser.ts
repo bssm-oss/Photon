@@ -25,7 +25,7 @@ function indentLevel(line: string): number {
 }
 
 export function parsePui(source: string): PuiDocument {
-  const lines = source.split("\n").map((l) => l.replace(/\s+$/, "")).filter((l) => l.length > 0 && !l.startsWith("//"));
+  const lines = source.split("\n").map((l) => l.replace(/\s+$/, "")).filter((l) => l.length > 0 && !l.trimStart().startsWith("//"));
 
   let i = 0;
   function parseNode(indent: number): PuiNode {
@@ -95,6 +95,11 @@ function parseValue(key: string, raw: string, line: number): PuiValue {
   }
 
   if (SIZE_KEYS.has(key) || POS_KEYS.has(key)) {
+    if (raw.endsWith("%")) {
+      const num = parseFloat(raw.slice(0, -1));
+      if (isNaN(num)) throw new PuiSyntaxError(line, `Expected number% for "${key}", got: ${raw}`);
+      return raw;
+    }
     const num = Number(raw);
     if (isNaN(num)) throw new PuiSyntaxError(line, `Expected number for "${key}", got: ${raw}`);
     return num;

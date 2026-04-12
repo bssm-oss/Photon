@@ -307,6 +307,11 @@ export class UIRenderSystem extends System {
     const ctx = this.ctx;
     ctx.clearRect(0, 0, this.logicalW, this.logicalH);
 
+    for (const arch of archetypes) {
+      const ui = arch.get<UITransform>("uiTransform");
+      if (ui) ui.resolve(this.logicalW, this.logicalH);
+    }
+
     archetypes.sort((a, b) => {
       const za = a.get<UITransform>("uiTransform")?.zIndex ?? 0;
       const zb = b.get<UITransform>("uiTransform")?.zIndex ?? 0;

@@ -1,5 +1,5 @@
 import { World } from "../../ecs/World";
-import { PuiDocument, PuiNode, PuiValue } from "./PuiTypes";
+import { PuiDocument, PuiNode, PuiValue, isPercent, parsePercent } from "./PuiTypes";
 import { UITransform } from "../UITransform";
 import { UIPanel } from "../UIPanel";
 import { UIButton } from "./../UIButton";
@@ -57,6 +57,12 @@ function buildNode(world: World, node: PuiNode, entities: EntityMap, parentX: nu
     num(p.originX, 0), num(p.originY, 0),
   );
   tx.zIndex = num(p.zIndex, 0);
+
+  if (isPercent(p.x)) tx.pct.xPct = parsePercent(p.x);
+  if (isPercent(p.y)) tx.pct.yPct = parsePercent(p.y);
+  if (isPercent(p.width)) tx.pct.widthPct = parsePercent(p.width);
+  if (isPercent(p.height)) tx.pct.heightPct = parsePercent(p.height);
+
   world.addComponent(entity.id, tx);
 
   switch (node.type) {
